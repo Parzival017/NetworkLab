@@ -41,9 +41,7 @@ struct returnData {
     QString msg;
 };
 
-class TFTPClient: public QObject {
-    Q_OBJECT
-
+class TFTPClient {
 private:
     WSADATA wsaData;
     SOCKET sock;              //客户端socket

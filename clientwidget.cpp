@@ -8,6 +8,7 @@
 #include "ui_ClientWidget.h"
 
 
+
 ClientWidget::ClientWidget(QWidget *parent) :
         QWidget(parent), ui(new Ui::ClientWidget) {
     ui->setupUi(this);
@@ -43,33 +44,29 @@ void ClientWidget::sendFile() {
     tftpClient = new TFTPClient(logger);
     QString ip = ui->IP_lineEdit->text();
     QString fileName = ui->send_lineEdit->text();
-    struct returnData data = tftpClient.sendFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
+    struct returnData data = tftpClient->sendFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
     makeLog(&data);
-    delete &tftpClient;
+    delete tftpClient;
 
     progressDialog->close();
 }
 
 void ClientWidget::receiveFile() {
-    //创建等待窗口
-    QProgressDialog *progressDialog = new QProgressDialog(this);
-    progressDialog->setWindowTitle("Please wait:receiving...");
-    //不显示进度条和取消按钮，仅显示label
-    progressDialog->setLabelText(QLabel::tr("Receiving..."));
-    progressDialog->setMinimumDuration(0);
-    progressDialog->show();
 
 
-    tftpClient = TFTPClient(logger);
+
+    tftpClient = new TFTPClient(logger);
     QString ip = ui->IP_lineEdit->text();
     QString fileName = ui->receive_lineEdit->text();
-    struct returnData data = tftpClient.receiveFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
+    struct returnData data = tftpClient->receiveFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
     QDateTime time = QDateTime::currentDateTime();
     makeLog(&data);
-    delete &tftpClient;
-    progressDialog->setValue(100);
+    delete tftpClient;
 
-    progressDialog->close();
+//    MyThread *thread = new MyThread();
+//    thread->init(fileName.toStdString().c_str(), ip.toStdString().c_str(), THREAD_RECEIVE, logger);
+//    thread->start();
+
 }
 
 void ClientWidget::displayLog(QString log) {

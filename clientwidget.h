@@ -9,6 +9,7 @@
 #include <QThread>
 #include "TFTPClient.h"
 #include "MyLogger.h"
+#include "MyThread.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientWidget; }
@@ -29,7 +30,7 @@ public:
 
 private:
     MyLogger *logger;
-    TFTPClient tftpClient;
+    TFTPClient *tftpClient;
     Ui::ClientWidget *ui;
 };
 
