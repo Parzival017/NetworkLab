@@ -7,7 +7,6 @@
 
 #include <QWidget>
 #include <QThread>
-#include "waitingdialog.h"
 #include "TFTPClient.h"
 #include "MyLogger.h"
 
@@ -25,10 +24,12 @@ public:
     void sendFile();
     void receiveFile();
     void chooseFile();
+    void displayLog(QString log);
+    void makeLog(struct returnData* data);
 
 private:
     MyLogger *logger;
-    TFTPClient *tftpClient;
+    TFTPClient tftpClient;
     Ui::ClientWidget *ui;
 };
 

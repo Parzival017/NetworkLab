@@ -30,19 +30,62 @@ void ClientWidget::chooseFile() {
 }
 
 void ClientWidget::sendFile() {
+    //创建等待窗口
+    QProgressDialog *progressDialog = new QProgressDialog(this);
+    progressDialog->setWindowTitle("Please wait:Sending...");
+    //不显示进度条和取消按钮，仅显示label
+    progressDialog->setLabelText(QLabel::tr("Sending..."));
+    progressDialog->setMinimumDuration(0);
+    progressDialog->show();
+
+
 
     tftpClient = new TFTPClient(logger);
     QString ip = ui->IP_lineEdit->text();
     QString fileName = ui->send_lineEdit->text();
-    tftpClient->sendFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
-    delete tftpClient;
+    struct returnData data = tftpClient.sendFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
+    makeLog(&data);
+    delete &tftpClient;
+
+    progressDialog->close();
 }
 
 void ClientWidget::receiveFile() {
-    tftpClient = new TFTPClient(logger);
+    //创建等待窗口
+    QProgressDialog *progressDialog = new QProgressDialog(this);
+    progressDialog->setWindowTitle("Please wait:receiving...");
+    //不显示进度条和取消按钮，仅显示label
+    progressDialog->setLabelText(QLabel::tr("Receiving..."));
+    progressDialog->setMinimumDuration(0);
+    progressDialog->show();
+
+
+    tftpClient = TFTPClient(logger);
     QString ip = ui->IP_lineEdit->text();
     QString fileName = ui->receive_lineEdit->text();
-    tftpClient->receiveFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
-    delete tftpClient;
+    struct returnData data = tftpClient.receiveFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
+    QDateTime time = QDateTime::currentDateTime();
+    makeLog(&data);
+    delete &tftpClient;
+    progressDialog->setValue(100);
+
+    progressDialog->close();
 }
 
+void ClientWidget::displayLog(QString log) {
+
+    ui->textBrowser->append(log);
+}
+
+void ClientWidget::makeLog(struct returnData* data) {
+    QDateTime time = QDateTime::currentDateTime();
+    QString current_time = time.toString("yyyy-MM-dd hh:mm:ss");
+    QString log;
+    if(data->code == RET_SUCCESS)
+        log = current_time + " SUCCESS " + data->msg;
+    else if(data->code == RET_ERROR)
+        log = current_time + " ERROR " + data->msg;
+    else
+        log = current_time + " TIMEOUT " + data->msg;
+    displayLog(log);
+}

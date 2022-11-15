@@ -9,6 +9,8 @@
 #include <QDebug>
 #include <QFileDialog>
 #include <QRandomGenerator>
+#include <QElapsedTimer>
+#include <QProgressDialog>
 #include "MyLogger.h"
 
 #define SERVER_PORT 69     //TFTP服务端口号
@@ -28,10 +30,20 @@
 //最大重传次数
 #define MAX_RESEND_COUNT 3
 
-#define SLEEPTIME 10
-#define TIMEOUT 3000
+#define TIMEOUT 2
 
-class TFTPClient {
+#define RET_SUCCESS 0
+#define RET_TIMEOUT 1
+#define RET_ERROR 2
+
+struct returnData {
+    int code = RET_SUCCESS;
+    QString msg;
+};
+
+class TFTPClient: public QObject {
+    Q_OBJECT
+
 private:
     WSADATA wsaData;
     SOCKET sock;              //客户端socket
@@ -41,7 +53,8 @@ private:
     char recvBuffer[MAX_BUFFER],sendBuffer[MAX_BUFFER];
     QRandomGenerator randomGenerator;   //随机数产生器
     MyLogger *logger;                   //日志记录器
-    long bytesTransferred;   //已传输字节数
+    struct timeval tv;
+    fd_set readfds;
 public:
     TFTPClient(MyLogger *mylogger){
         // Initialize Winsock
@@ -64,12 +77,12 @@ public:
     ~TFTPClient(){
         WSACleanup();
     };
-    void start(const char* serverIP);
-    void stop();
-    void uploadFile(const char* fileName);
-    void downloadFile(const char* fileName);
-    void sendFile(const char* fileName,const char * serverIP);
-    void receiveFile(const char* fileName,const char * serverIP);
+    bool start(const char* serverIP);
+    bool stop();
+    void uploadFile(const char* fileName,struct returnData* retData);
+    void downloadFile(const char* fileName,struct returnData* retData);
+    struct returnData sendFile(const char* fileName,const char * serverIP);
+    struct returnData receiveFile(const char* fileName,const char * serverIP);
 };
 
 

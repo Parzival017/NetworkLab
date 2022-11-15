@@ -6,12 +6,18 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>790</width>
-    <height>250</height>
+    <width>786</width>
+    <height>457</height>
    </rect>
   </property>
+  <property name="sizePolicy">
+   <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+    <horstretch>0</horstretch>
+    <verstretch>0</verstretch>
+   </sizepolicy>
+  </property>
   <property name="windowTitle">
-   <string>ClientWidget</string>
+   <string>@Parzival TFTP Client</string>
   </property>
   <widget class="QWidget" name="verticalLayoutWidget">
    <property name="geometry">
@@ -19,7 +25,7 @@
      <x>10</x>
      <y>10</y>
      <width>771</width>
-     <height>231</height>
+     <height>441</height>
     </rect>
    </property>
    <layout class="QVBoxLayout" name="verticalLayout">
@@ -59,7 +65,7 @@
       <item>
        <widget class="QLineEdit" name="IP_lineEdit">
         <property name="text">
-         <string>10.12.170.224</string>
+         <string>127.0.0.1</string>
         </property>
        </widget>
       </item>
@@ -127,6 +133,9 @@
        </widget>
       </item>
      </layout>
+    </item>
+    <item>
+     <widget class="QTextBrowser" name="textBrowser"/>
     </item>
    </layout>
   </widget>
