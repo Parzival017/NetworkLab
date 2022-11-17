@@ -31,58 +31,44 @@ void ClientWidget::chooseFile() {
 }
 
 void ClientWidget::sendFile() {
-    //创建等待窗口
-    QProgressDialog *progressDialog = new QProgressDialog(this);
-    progressDialog->setWindowTitle("Please wait:Sending...");
-    //不显示进度条和取消按钮，仅显示label
-    progressDialog->setLabelText(QLabel::tr("Sending..."));
-    progressDialog->setMinimumDuration(0);
-    progressDialog->show();
 
-
-
-    tftpClient = new TFTPClient(logger);
     QString ip = ui->IP_lineEdit->text();
     QString fileName = ui->send_lineEdit->text();
-    struct returnData data = tftpClient->sendFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
-    makeLog(&data);
-    delete tftpClient;
-
-    progressDialog->close();
+    MyThread *thread = new MyThread();
+    thread->init(fileName, ip, THREAD_SEND, logger);
+    connect(thread, SIGNAL(updateMsg(QString)), this, SLOT(displayMsg(QString)));
+    //弹出一对话框显示文件名及传输速度
+    MyDialog *dialog = new MyDialog();
+    dialog->setWindowTitle("Recerving" + fileName);
+    connect(thread, SIGNAL(updateSpeed(float, float)), dialog, SLOT(displaySpeed(float, float)));
+    dialog->show();
+    thread->start();
+    //进程结束后，关闭对话框
+    connect(thread, SIGNAL(finished()), dialog, SLOT(close()));
 }
 
 void ClientWidget::receiveFile() {
 
-
-
-    tftpClient = new TFTPClient(logger);
     QString ip = ui->IP_lineEdit->text();
     QString fileName = ui->receive_lineEdit->text();
-    struct returnData data = tftpClient->receiveFile(fileName.toStdString().c_str(), ip.toStdString().c_str());
-    QDateTime time = QDateTime::currentDateTime();
-    makeLog(&data);
-    delete tftpClient;
 
-//    MyThread *thread = new MyThread();
-//    thread->init(fileName.toStdString().c_str(), ip.toStdString().c_str(), THREAD_RECEIVE, logger);
-//    thread->start();
-
+    MyThread *thread = new MyThread();
+    thread->init(fileName, ip, THREAD_RECEIVE, logger);
+    connect(thread, SIGNAL(updateMsg(QString)), this, SLOT(displayMsg(QString)));
+    //弹出一对话框显示文件名及传输速度
+    MyDialog *dialog = new MyDialog();
+    dialog->setWindowTitle("Recerving" + fileName);
+    connect(thread, SIGNAL(updateSpeed(float, float)), dialog, SLOT(displaySpeed(float, float)));
+    dialog->show();
+    thread->start();
+    //进程结束后，关闭对话框
+    connect(thread, SIGNAL(finished()), dialog, SLOT(close()));
 }
 
-void ClientWidget::displayLog(QString log) {
+void ClientWidget::displayMsg(QString msg) {
 
-    ui->textBrowser->append(log);
+    ui->textBrowser->append(msg);
 }
 
-void ClientWidget::makeLog(struct returnData* data) {
-    QDateTime time = QDateTime::currentDateTime();
-    QString current_time = time.toString("yyyy-MM-dd hh:mm:ss");
-    QString log;
-    if(data->code == RET_SUCCESS)
-        log = current_time + " SUCCESS " + data->msg;
-    else if(data->code == RET_ERROR)
-        log = current_time + " ERROR " + data->msg;
-    else
-        log = current_time + " TIMEOUT " + data->msg;
-    displayLog(log);
-}
+
+

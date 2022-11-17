@@ -7,9 +7,9 @@
 
 #include <QWidget>
 #include <QThread>
-#include "TFTPClient.h"
 #include "MyLogger.h"
 #include "MyThread.h"
+#include "mydialog.h"
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class ClientWidget; }
@@ -25,12 +25,13 @@ public:
     void sendFile();
     void receiveFile();
     void chooseFile();
-    void displayLog(QString log);
-    void makeLog(struct returnData* data);
+
+    private slots:
+    void displayMsg(QString msg);
+
 
 private:
     MyLogger *logger;
-    TFTPClient *tftpClient;
     Ui::ClientWidget *ui;
 };
 

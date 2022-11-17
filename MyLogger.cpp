@@ -10,6 +10,7 @@ MyLogger::MyLogger() {
         return;
     }
     out.setDevice(&file);
+
     out << "**********************************************************\n";
     out << "                  MyLogger initialized                    \n";
     QString current_date_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss:zzz");
@@ -27,6 +28,9 @@ MyLogger::~MyLogger() {
 }
 
 void MyLogger::log(QString msg) {
+    //互斥访问out
     QString current_date_time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:zzz");
+    mutex.lock();
     out << current_date_time+" "+msg+"\n";
+    mutex.unlock();
 }
